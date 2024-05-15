@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 import PyPDF2
 from openai import OpenAI
 from timeit import default_timer as timer
@@ -13,8 +13,7 @@ def is_meaningful_text(text):
     # Check if the text is meaningful based on its length
     return len(text.strip()) >= min_text_length
 
-
-def extract_text_from_pdf(pdf_path, txt_path):
+def extract_text_from_pdf(pdf_path, txt_path, selected_model):
     try:
         # Open the PDF file
         with open(pdf_path, 'rb') as pdf_file:
@@ -41,13 +40,13 @@ def extract_text_from_pdf(pdf_path, txt_path):
 
                     number_of_questions += 1
 
-                    # Generate mistral questions and print them
-                    print("\"question" + str(number_of_questions) + "\": ")
-                    print(make_call_to_mistral(page_text, system_message) + ",")
-
-                    # # Generate ChatGPT questions and print them
-                    # print("\"question" + str(number_of_questions) + "\": ")
-                    # print(make_call_to_chat_gpt(page_text, system_message) + ",")
+                    # Generate questions and print them based on the selected model
+                    if selected_model == "mistral":
+                        print("\"question" + str(number_of_questions) + "\": ")
+                        print(make_call_to_mistral(page_text, system_message) + ",")
+                    elif selected_model == "chat_gpt":
+                        print("\"question" + str(number_of_questions) + "\": ")
+                        print(make_call_to_chat_gpt(page_text, system_message) + ",")
 
             # Stop timer
             end = timer()
@@ -74,14 +73,14 @@ def extract_text():
     pdf_path = pdf_path_entry.get()
     if pdf_path:
         txt_path = pdf_path.replace('.pdf', '.txt')
-        success, message = extract_text_from_pdf(pdf_path, txt_path)
+        selected_model = model_var.get()
+        success, message = extract_text_from_pdf(pdf_path, txt_path, selected_model)
         if success:
-            tk.messagebox.showinfo('Success', 'Text extracted successfully!')
+            messagebox.showinfo('Success', 'Text extracted successfully!')
         else:
-            tk.messagebox.showerror('Extraction Failed', f'Error: {message}')
+            messagebox.showerror('Extraction Failed', f'Error: {message}')
     else:
-        tk.messagebox.showerror('Error', 'Please select a PDF file!')
-
+        messagebox.showerror('Error', 'Please select a PDF file!')
 
 def make_call_to_mistral(user_input, system_input):
     completion = client.chat.completions.create(
@@ -150,6 +149,13 @@ tk.Label(root, text='Select PDF file:').pack()
 pdf_path_entry = tk.Entry(root, width=50)
 pdf_path_entry.pack()
 tk.Button(root, text='Browse', command=select_pdf).pack(pady=5)
+
+# Create and place radiobuttons
+model_var = tk.StringVar(value="mistral")
+tk.Label(root, text='Select Model:').pack()
+tk.Radiobutton(root, text="Mistral", variable=model_var, value="mistral").pack(anchor=tk.W)
+tk.Radiobutton(root, text="ChatGPT", variable=model_var, value="chat_gpt").pack(anchor=tk.W)
+
 tk.Button(root, text='Extract Text', command=extract_text).pack(pady=5)
 tk.Button(root, text='Exit', command=root.destroy).pack(pady=5)
 
