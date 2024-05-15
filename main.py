@@ -42,11 +42,12 @@ def extract_text_from_pdf(pdf_path, txt_path):
                     number_of_questions += 1
 
                     # Generate mistral questions and print them
-                    # print(make_call_to_mistral(page_text, system_message))
-
-                    # Generate ChatGPT questions and print them
                     print("\"question" + str(number_of_questions) + "\": ")
-                    print(make_call_to_chat_gpt(page_text, system_message) + ",")
+                    print(make_call_to_mistral(page_text, system_message) + ",")
+
+                    # # Generate ChatGPT questions and print them
+                    # print("\"question" + str(number_of_questions) + "\": ")
+                    # print(make_call_to_chat_gpt(page_text, system_message) + ",")
 
             # Stop timer
             end = timer()
