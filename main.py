@@ -44,7 +44,6 @@ def extract_text_from_pdf(pdf_path, txt_path):
 
                     # Generate questions and print them
                     print(make_call_to_chat_gpt(page_text, system_message))
-                    print("------------------------------------------------------------------------------------")
 
             # Stop timer
             end = timer()
@@ -128,6 +127,14 @@ system_message = (
     "Create 1 quiz question from the text. "
     "Give 3 possible answers, 1 of these answers is correct, the others should be wrong. "
     "Mark the correct answer."
+    "Formulate answer in json formate where: "
+    "under 'question' tag question is stated, "
+    "under 'optionA' tag option A is stated, "
+    "under 'optionB' tag option B is stated, "
+    "under 'optionC' tag option C is stated, "
+    "under 'correctAnswerLetter' tag correct option letter is stated"
+    "no need for '```json' at the beginning and end"
+
 )
 
 # Create the main window
