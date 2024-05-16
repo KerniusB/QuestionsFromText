@@ -14,17 +14,15 @@ def is_meaningful_text(text):
 
 
 # Function to extract text from PDF and generate questions
-def extract_text_from_pdf(pdf_path, txt_path, selected_model):
+def extract_text_from_pdf(pdf_path, selected_model):
     try:
         with open(pdf_path, 'rb') as pdf_file:
             pdf_reader = PyPDF2.PdfReader(pdf_file)
-            text = ''
             number_of_questions = 0
 
             for page_num, page in enumerate(pdf_reader.pages):
                 page_text = page.extract_text()
                 if is_meaningful_text(page_text):
-                    text += page_text + '\n'
 
                     if number_of_questions == 0:
                         start = timer()
@@ -39,9 +37,6 @@ def extract_text_from_pdf(pdf_path, txt_path, selected_model):
             print(f"Prompt tokens: {number_of_prompt_tokens}")
             print(f"Output tokens: {number_of_completion_tokens}")
 
-            with open(txt_path, 'w', encoding='utf-8') as txt_file:
-                txt_file.write(text)
-
         return True, None
     except Exception as e:
         return False, str(e)
@@ -54,13 +49,12 @@ def select_pdf():
     pdf_path_entry.insert(0, pdf_path)
 
 
-# Function to extract text from the selected PDF file
-def extract_text():
+# Function to extract text from the selected PDF file and generate questions
+def generate_questions():
     pdf_path = pdf_path_entry.get()
     if pdf_path:
-        txt_path = pdf_path.replace('.pdf', '.txt')
         selected_model = model_var.get()
-        success, message = extract_text_from_pdf(pdf_path, txt_path, selected_model)
+        success, message = extract_text_from_pdf(pdf_path, selected_model)
         if success:
             messagebox.showinfo('Success', 'Text extracted successfully!')
         else:
@@ -150,7 +144,7 @@ tk.Radiobutton(root, text="Mistral", variable=model_var, value="mistral").pack(a
 tk.Radiobutton(root, text="ChatGPT", variable=model_var, value="chat_gpt").pack(anchor=tk.W)
 
 # Create and place buttons
-tk.Button(root, text='Extract Text', command=extract_text).pack(pady=5)
+tk.Button(root, text='Generate questions', command=generate_questions).pack(pady=5)
 tk.Button(root, text='Exit', command=root.destroy).pack(pady=5)
 
 # Run the application
