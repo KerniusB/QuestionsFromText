@@ -6,8 +6,6 @@ from openai import OpenAI
 from timeit import default_timer as timer
 from dotenv import load_dotenv
 from tkinter import ttk
-import json
-import time
 
 
 # Function to check if the extracted text is meaningful based on its length
@@ -22,7 +20,6 @@ def extract_text_from_pdf_and_generate_questions(pdf_path, selected_model):
         with open(pdf_path, 'rb') as pdf_file:
             pdf_reader = PyPDF2.PdfReader(pdf_file)
             number_of_questions = 0
-            questions_dict = {}
 
             for page_num, page in enumerate(pdf_reader.pages):
                 page_text = page.extract_text()
@@ -33,20 +30,14 @@ def extract_text_from_pdf_and_generate_questions(pdf_path, selected_model):
                     number_of_questions += 1
 
                     question = generate_question(page_text, selected_model)
-                    questions_dict[f"question{number_of_questions}"] = question
+                    print(f"\"question{number_of_questions}\": {question},")
 
             end = timer()
             print(f"GENERATING TOOK: {end - start}")
 
-        return True, questions_dict
+        return True, None
     except Exception as e:
         return False, str(e)
-
-
-# Function to save questions dictionary to a JSON file
-def save_questions_to_json(questions_dict, filename):
-    with open(filename, 'w') as json_file:
-        json.dump(questions_dict, json_file, indent=4)
 
 
 # Function to select PDF file
@@ -61,13 +52,11 @@ def generate_questions():
     pdf_path = pdf_path_entry.get()
     if pdf_path:
         selected_model = model_var.get()
-        success, questions_dict = extract_text_from_pdf_and_generate_questions(pdf_path, selected_model)
+        success, message = extract_text_from_pdf_and_generate_questions(pdf_path, selected_model)
         if success:
-            filename = os.path.join(os.getcwd(), "generated_questions" + time.strftime("%Y%m%d-%H%M%S") + ".json")
-            save_questions_to_json(questions_dict, filename)
-            messagebox.showinfo('Success', 'Questions generated and saved successfully!')
+            messagebox.showinfo('Success', 'Text extracted and questions generated successfully!')
         else:
-            messagebox.showerror('Extraction Failed', f'Error: {questions_dict}')
+            messagebox.showerror('Extraction Failed', f'Error: {message}')
     else:
         messagebox.showerror('Error', 'Please select a PDF file!')
 
