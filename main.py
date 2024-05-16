@@ -15,7 +15,7 @@ def is_meaningful_text(text):
 
 
 # Function to extract text from PDF and generate questions
-def extract_text_from_pdf(pdf_path, selected_model):
+def extract_text_from_pdf_and_generate_questions(pdf_path, selected_model):
     try:
         with open(pdf_path, 'rb') as pdf_file:
             pdf_reader = PyPDF2.PdfReader(pdf_file)
@@ -52,9 +52,9 @@ def generate_questions():
     pdf_path = pdf_path_entry.get()
     if pdf_path:
         selected_model = model_var.get()
-        success, message = extract_text_from_pdf(pdf_path, selected_model)
+        success, message = extract_text_from_pdf_and_generate_questions(pdf_path, selected_model)
         if success:
-            messagebox.showinfo('Success', 'Text extracted successfully!')
+            messagebox.showinfo('Success', 'Text extracted and questions generated successfully!')
         else:
             messagebox.showerror('Extraction Failed', f'Error: {message}')
     else:
@@ -93,10 +93,6 @@ def make_call_to_chat_gpt(user_input, system_input):
     )
     return completion.choices[0].message.content
 
-
-# Initialization of token counters
-number_of_prompt_tokens = 0
-number_of_completion_tokens = 0
 
 # Point to the local server
 client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
