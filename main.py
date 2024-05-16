@@ -129,23 +129,29 @@ system_message = (
 
 # Create the main window
 root = tk.Tk()
-root.title('PDF Text Extractor')
+root.title('Questions generator from PDF')
 
 # Create and place widgets
 tk.Label(root, text='Select PDF file:').pack()
-pdf_path_entry = tk.Entry(root, width=50)
+pdf_selection_frame = tk.Frame(root)
+pdf_selection_frame.pack()
+tk.Button(pdf_selection_frame, text='Browse', command=select_pdf).pack(side=tk.LEFT)
+pdf_path_entry = tk.Entry(pdf_selection_frame, width=50)
 pdf_path_entry.pack()
-tk.Button(root, text='Browse', command=select_pdf).pack(pady=5)
 
-# Create and place radiobuttons for model selection
+# Create frame for model selection
+model_frame = tk.Frame(root)
+model_frame.pack()
+tk.Label(model_frame, text='Select Model:').pack(side=tk.LEFT)
 model_var = tk.StringVar(value="mistral")
-tk.Label(root, text='Select Model:').pack()
-tk.Radiobutton(root, text="Mistral", variable=model_var, value="mistral").pack(anchor=tk.W)
-tk.Radiobutton(root, text="ChatGPT", variable=model_var, value="chat_gpt").pack(anchor=tk.W)
+tk.Radiobutton(model_frame, text="Mistral", variable=model_var, value="mistral").pack(side=tk.LEFT)
+tk.Radiobutton(model_frame, text="ChatGPT", variable=model_var, value="chat_gpt").pack(side=tk.LEFT)
 
 # Create and place buttons
-tk.Button(root, text='Generate questions', command=generate_questions).pack(pady=5)
-tk.Button(root, text='Exit', command=root.destroy).pack(pady=5)
+button_frame = tk.Frame(root)
+button_frame.pack()
+tk.Button(button_frame, text='Generate questions', command=generate_questions).pack(side=tk.LEFT, pady=5)
+tk.Button(button_frame, text='Exit', command=root.destroy).pack(side=tk.LEFT, pady=5)
 
 # Run the application
 root.mainloop()
