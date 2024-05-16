@@ -1,4 +1,5 @@
 import os
+import json
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import PyPDF2
@@ -6,12 +7,32 @@ from openai import OpenAI
 from timeit import default_timer as timer
 from dotenv import load_dotenv
 from tkinter import ttk
+import time
 
 
 # Function to check if the extracted text is meaningful based on its length
 def is_meaningful_text(text):
     min_text_length = 10
     return len(text.strip()) >= min_text_length
+
+
+def remove_chars_from_end(string):
+    last_comma_index = string.rfind(',')
+    if last_comma_index != -1:
+        return string[:last_comma_index]
+    else:
+        return string
+
+
+def string_to_json(questions_string):
+    # Parse the string to a Python dictionary
+    questions_dict = json.loads(questions_string)
+
+    # Save the dictionary to a JSON file
+    with open(str(time.strftime("%Y%m%d-%H%M%S")) + ".json", 'w') as json_file:
+        json.dump(questions_dict, json_file, indent=2)
+
+    print("JSON file saved successfully.")
 
 
 # Function to extract text from PDF and generate questions
@@ -26,12 +47,16 @@ def extract_text_from_pdf_and_generate_questions(pdf_path, selected_model):
                 if is_meaningful_text(page_text):
                     if number_of_questions == 0:
                         start = timer()
+                        json_string = '{'
 
                     number_of_questions += 1
 
                     question = generate_question(page_text, selected_model)
-                    print(f"\"question{number_of_questions}\": {question},")
+                    json_string += f"\"question{number_of_questions}\": {question},"
 
+            json_string = remove_chars_from_end(json_string)
+            json_string += '}'
+            string_to_json(json_string)
             end = timer()
             print(f"GENERATING TOOK: {end - start}")
 
@@ -50,6 +75,8 @@ def select_pdf():
 # Function to extract text from the selected PDF file and generate questions
 def generate_questions():
     pdf_path = pdf_path_entry.get()
+    if pdf_path == "":
+        pdf_path = "/Users/kerniusbrazauskas/Desktop/Constitution of the Republic of Lithuania.pdf"
     if pdf_path:
         selected_model = model_var.get()
         success, message = extract_text_from_pdf_and_generate_questions(pdf_path, selected_model)
@@ -133,9 +160,9 @@ pdf_path_entry.pack()
 model_frame = ttk.Frame(root)
 model_frame.pack(pady=10)
 ttk.Label(model_frame, text='Select Model:').pack(side=tk.LEFT)
-model_var = tk.StringVar(value="mistral")
-ttk.Radiobutton(model_frame, text="Mistral", variable=model_var, value="mistral").pack(side=tk.LEFT)
+model_var = tk.StringVar(value="chat_gpt")
 ttk.Radiobutton(model_frame, text="ChatGPT", variable=model_var, value="chat_gpt").pack(side=tk.LEFT)
+ttk.Radiobutton(model_frame, text="Mistral", variable=model_var, value="mistral").pack(side=tk.LEFT)
 
 # Create frame for buttons
 button_frame = ttk.Frame(root)
