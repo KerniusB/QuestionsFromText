@@ -5,6 +5,7 @@ import PyPDF2
 from openai import OpenAI
 from timeit import default_timer as timer
 from dotenv import load_dotenv
+from tkinter import ttk
 
 
 # Function to check if the extracted text is meaningful based on its length
@@ -23,7 +24,6 @@ def extract_text_from_pdf(pdf_path, selected_model):
             for page_num, page in enumerate(pdf_reader.pages):
                 page_text = page.extract_text()
                 if is_meaningful_text(page_text):
-
                     if number_of_questions == 0:
                         start = timer()
 
@@ -34,8 +34,6 @@ def extract_text_from_pdf(pdf_path, selected_model):
 
             end = timer()
             print(f"GENERATING TOOK: {end - start}")
-            print(f"Prompt tokens: {number_of_prompt_tokens}")
-            print(f"Output tokens: {number_of_completion_tokens}")
 
         return True, None
     except Exception as e:
@@ -93,12 +91,6 @@ def make_call_to_chat_gpt(user_input, system_input):
             {"role": "user", "content": user_input}
         ]
     )
-    global number_of_prompt_tokens
-    global number_of_completion_tokens
-
-    number_of_prompt_tokens += completion.usage.prompt_tokens
-    number_of_completion_tokens += completion.usage.completion_tokens
-
     return completion.choices[0].message.content
 
 
@@ -131,27 +123,29 @@ system_message = (
 root = tk.Tk()
 root.title('Questions generator from PDF')
 
-# Create and place widgets
-tk.Label(root, text='Select PDF file:').pack()
-pdf_selection_frame = tk.Frame(root)
-pdf_selection_frame.pack()
-tk.Button(pdf_selection_frame, text='Browse', command=select_pdf).pack(side=tk.LEFT)
-pdf_path_entry = tk.Entry(pdf_selection_frame, width=50)
+# Top label
+ttk.Label(root, text='Select PDF file:').pack()
+
+# Create frame for PDF selection
+pdf_selection_frame = ttk.Frame(root)
+pdf_selection_frame.pack(pady=10)
+ttk.Button(pdf_selection_frame, text='Browse', command=select_pdf).pack(side=tk.LEFT, padx=5)
+pdf_path_entry = ttk.Entry(pdf_selection_frame, width=70)
 pdf_path_entry.pack()
 
 # Create frame for model selection
-model_frame = tk.Frame(root)
-model_frame.pack()
-tk.Label(model_frame, text='Select Model:').pack(side=tk.LEFT)
+model_frame = ttk.Frame(root)
+model_frame.pack(pady=10)
+ttk.Label(model_frame, text='Select Model:').pack(side=tk.LEFT)
 model_var = tk.StringVar(value="mistral")
-tk.Radiobutton(model_frame, text="Mistral", variable=model_var, value="mistral").pack(side=tk.LEFT)
-tk.Radiobutton(model_frame, text="ChatGPT", variable=model_var, value="chat_gpt").pack(side=tk.LEFT)
+ttk.Radiobutton(model_frame, text="Mistral", variable=model_var, value="mistral").pack(side=tk.LEFT)
+ttk.Radiobutton(model_frame, text="ChatGPT", variable=model_var, value="chat_gpt").pack(side=tk.LEFT)
 
-# Create and place buttons
-button_frame = tk.Frame(root)
-button_frame.pack()
-tk.Button(button_frame, text='Generate questions', command=generate_questions).pack(side=tk.LEFT, pady=5)
-tk.Button(button_frame, text='Exit', command=root.destroy).pack(side=tk.LEFT, pady=5)
+# Create frame for buttons
+button_frame = ttk.Frame(root)
+button_frame.pack(pady=10)
+ttk.Button(button_frame, text='Generate questions', command=generate_questions).pack(side=tk.LEFT)
+ttk.Button(button_frame, text='Exit', command=root.destroy).pack(side=tk.LEFT)
 
 # Run the application
 root.mainloop()
