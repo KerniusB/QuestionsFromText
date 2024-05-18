@@ -81,7 +81,7 @@ def generate_questions():
         selected_model = model_var.get()
         success, message = extract_text_from_pdf_and_generate_questions(pdf_path, selected_model)
         if success:
-            messagebox.showinfo('Success', 'Text extracted and questions generated successfully!')
+            print(i)
         else:
             messagebox.showerror('Extraction Failed', f'Error: {message}')
     else:
@@ -170,5 +170,10 @@ button_frame.pack(pady=10)
 ttk.Button(button_frame, text='Generate questions', command=generate_questions).pack(side=tk.LEFT)
 ttk.Button(button_frame, text='Exit', command=root.destroy).pack(side=tk.LEFT)
 
-# Run the application
-root.mainloop()
+# # Run the application
+# root.mainloop()
+
+i = 0
+while i < 30:
+    i += 1
+    generate_questions()
