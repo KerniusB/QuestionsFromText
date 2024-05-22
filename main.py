@@ -81,7 +81,7 @@ def generate_questions():
         selected_model = model_var.get()
         success, message = extract_text_from_pdf_and_generate_questions(pdf_path, selected_model)
         if success:
-            print(i)
+            messagebox.showinfo('Success', 'Text generated successfully!')
         else:
             messagebox.showerror('Extraction Failed', f'Error: {message}')
     else:
@@ -98,7 +98,7 @@ def generate_question(user_input, model):
 
 # Function to call Mistral model API
 def make_call_to_mistral(user_input, system_input):
-    completion = client.chat.completions.create(
+    response = mistralClient.chat.completions.create(
         model="TheBloke/Mistral-7B-Instruct-v0.2-GGUF",
         messages=[
             {"role": "system", "content": system_input},
@@ -106,27 +106,29 @@ def make_call_to_mistral(user_input, system_input):
         ],
         temperature=0.7,
     )
-    return completion.choices[0].message.content
+    return response.choices[0].message.content
 
 
 # Function to call ChatGPT model API
 def make_call_to_chat_gpt(user_input, system_input):
-    completion = chatGptClient.chat.completions.create(
+    response = openAiClient.chat.completions.create(
         model="gpt-3.5-turbo-0125",
         messages=[
             {"role": "system", "content": system_input},
             {"role": "user", "content": user_input}
         ]
     )
-    return completion.choices[0].message.content
+    return response.choices[0].message.content.strip()
 
 
 # Point to the local server
-client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
+mistralClient = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
 
-# Load environment variables
+# Load open AI key
 load_dotenv()
-chatGptClient = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+openAiClient = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+)
 
 # Define system message for generating questions
 system_message = (
@@ -170,10 +172,5 @@ button_frame.pack(pady=10)
 ttk.Button(button_frame, text='Generate questions', command=generate_questions).pack(side=tk.LEFT)
 ttk.Button(button_frame, text='Exit', command=root.destroy).pack(side=tk.LEFT)
 
-# # Run the application
-# root.mainloop()
-
-i = 0
-while i < 30:
-    i += 1
-    generate_questions()
+# Run the application
+root.mainloop()
