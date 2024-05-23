@@ -32,14 +32,25 @@ This project provides a tool for generating quiz questions from PDF documents. I
     pip install PyPDF2 openai python-dotenv
     ```
 
-3. Set up your environment variables:
+3. Set up ChatGPT key:
 
     - Create a `.env` file in the project root.
+    - Go to [OpenAI's website](https://platform.openai.com/).
+    - Sign up for an account or log in if you already have one. 
+    - Once logged in, navigate to the [API section of your account](https://platform.openai.com/api-keys).
+    - Generate a new API key.
     - Add your OpenAI API key to the `.env` file:
 
     ```plaintext
     OPENAI_API_KEY=your_openai_api_key
     ```
+   
+4. Setup Mistral 7B server
+
+    - Install LM Studio. You can download it from [here](https://lmstudio.ai).
+    - After installing LM Studio, under "Local Server" -> "Select a model to load", select "TheBloke/Mistral-7B-Instruct-v0.2-GGUF" model.
+    - Start the local server (be default server should be accessed "http://localhost:1234/v1").
+
 
 ## Usage
 
